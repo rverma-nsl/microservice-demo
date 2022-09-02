@@ -36,9 +36,9 @@ java -jar ~/dev/jacoco/lib/jacococli.jar merge order.exec shipping.exec invoicin
 ```shell
 
 java -jar ~/dev/jacoco/lib/jacococli.jar report merged.exec \
---classfiles microservice-istio-order/target/classes/com  \
---classfiles microservice-istio-shipping/target/classes/com  \
---classfiles microservice-istio-invoicing/target/classes/com  \
+--classfiles microservice-istio-order/target/classes/com --sourcefiles microservice-istio-order/src/main/java \
+--classfiles microservice-istio-shipping/target/classes/com --sourcefiles microservice-istio-shipping/src/main/java \
+--classfiles microservice-istio-invoicing/target/classes/com --sourcefiles microservice-istio-invoicing/src/main/java/ \
 --csv report.csv
 # --html report
 ```
