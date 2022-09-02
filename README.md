@@ -20,9 +20,9 @@ sleep 5
 # Pull the individual coverage reports
 
 ```shell
-java -jar src/main/resources/lib/jacococli.jar dump --address localhost --port 36321 --destfile order.exec
-java -jar src/main/resources/lib/jacococli.jar dump --address localhost --port 36322 --destfile shipping.exec
-java -jar src/main/resources/lib/jacococli.jar dump --address localhost --port 36323 --destfile invoicing.exec
+java -jar ~/dev/jacoco/lib/jacococli.jar dump --address localhost --port 36321 --destfile order.exec
+java -jar ~/dev/jacoco/lib/jacococli.jar dump --address localhost --port 36322 --destfile shipping.exec
+java -jar ~/dev/jacoco/lib/jacococli.jar dump --address localhost --port 36323 --destfile invoicing.exec
 
 ```
 
@@ -39,5 +39,6 @@ java -jar ~/dev/jacoco/lib/jacococli.jar report merged.exec \
 --classfiles microservice-istio-order/target/classes/com --sourcefiles microservice-istio-order/src/main/java \
 --classfiles microservice-istio-shipping/target/classes/com --sourcefiles microservice-istio-shipping/src/main/java \
 --classfiles microservice-istio-invoicing/target/classes/com --sourcefiles microservice-istio-invoicing/src/main/java/ \
---html report/
+--csv report.csv
+# --html report
 ```

@@ -16,7 +16,7 @@ services:
     depends_on:
       - postgres
     environment:
-      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320,destfile=order-it.exec
+      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320
     volumes:
       - jacoco:/jacoco:ro
   shipping:
@@ -28,7 +28,7 @@ services:
       - postgres
       - order
     environment:
-      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320,destfile=shipping-it.exec
+      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320
     volumes:
       - jacoco:/jacoco:ro
   invoicing:
@@ -40,7 +40,7 @@ services:
       - postgres
       - order
     environment:
-      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320,destfile=invoicing-it.exec
+      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320
     volumes:
       - jacoco:/jacoco:ro
   jacoco:
