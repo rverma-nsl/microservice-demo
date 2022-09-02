@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">com.ewolff.microservice.order.logic</a> &gt; <span class="el_source">OrderService.java</span></div><h1>OrderService.java</h1><pre class="source lang-java linenums">package com.ewolff.microservice.order.logic;
+
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+class OrderService {
+
+	private OrderRepository orderRepository;
+
+	@Autowired
+	public OrderService(OrderRepository orderRepository) {
+<span class="fc" id="L15">		super();</span>
+<span class="fc" id="L16">		this.orderRepository = orderRepository;</span>
+<span class="fc" id="L17">	}</span>
+
+	public Order order(Order order) {
+<span class="nc bnc" id="L20" title="All 2 branches missed.">		if (order.getNumberOfLines() == 0) {</span>
+<span class="nc" id="L21">			throw new IllegalArgumentException(&quot;No order lines!&quot;);</span>
+		}
+<span class="nc" id="L23">		order.setUpdated(new Date());</span>
+<span class="nc" id="L24">		return orderRepository.save(order);</span>
+	}
+
+	public double getPrice(long orderId) {
+<span class="nc" id="L28">		return orderRepository.findById(orderId).get().totalPrice();</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

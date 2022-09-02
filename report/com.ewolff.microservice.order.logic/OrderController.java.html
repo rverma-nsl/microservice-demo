@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">com.ewolff.microservice.order.logic</a> &gt; <span class="el_source">OrderController.java</span></div><h1>OrderController.java</h1><pre class="source lang-java linenums">package com.ewolff.microservice.order.logic;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.ewolff.microservice.order.customer.Customer;
+import com.ewolff.microservice.order.customer.CustomerRepository;
+import com.ewolff.microservice.order.item.ItemRepository;
+
+@Controller
+class OrderController {
+
+	private OrderRepository orderRepository;
+
+	private OrderService orderService;
+
+	private CustomerRepository customerRepository;
+	private ItemRepository itemRepository;
+
+	@Autowired
+	public OrderController(OrderService orderService, OrderRepository orderRepository,
+			CustomerRepository customerRepository, ItemRepository itemRepository) {
+<span class="fc" id="L32">		super();</span>
+<span class="fc" id="L33">		this.orderRepository = orderRepository;</span>
+<span class="fc" id="L34">		this.customerRepository = customerRepository;</span>
+<span class="fc" id="L35">		this.itemRepository = itemRepository;</span>
+<span class="fc" id="L36">		this.orderService = orderService;</span>
+<span class="fc" id="L37">	}</span>
+
+	@ModelAttribute(&quot;items&quot;)
+	public Iterable&lt;com.ewolff.microservice.order.item.Item&gt; items() {
+<span class="fc" id="L41">		return itemRepository.findAll();</span>
+	}
+
+	@ModelAttribute(&quot;customers&quot;)
+	public Iterable&lt;Customer&gt; customers() {
+<span class="fc" id="L46">		return customerRepository.findAll();</span>
+	}
+
+	@RequestMapping(&quot;/&quot;)
+	public ModelAndView orderList() {
+<span class="fc" id="L51">		return new ModelAndView(&quot;orderlist&quot;, &quot;orders&quot;, orderRepository.findAll());</span>
+	}
+
+	@RequestMapping(value = &quot;/form.html&quot;, method = RequestMethod.GET)
+	public ModelAndView form() {
+<span class="nc" id="L56">		return new ModelAndView(&quot;orderForm&quot;, &quot;order&quot;, new Order());</span>
+	}
+
+	@RequestMapping(value = &quot;/line&quot;, method = RequestMethod.POST)
+	public ModelAndView addLine(Order order) {
+<span class="nc" id="L61">		order.addLine(0, itemRepository.findAll().iterator().next());</span>
+<span class="nc" id="L62">		return new ModelAndView(&quot;orderForm&quot;, &quot;order&quot;, order);</span>
+	}
+
+	@RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.GET)
+	public ModelAndView get(@PathVariable(&quot;id&quot;) long id) {
+<span class="fc" id="L67">		return new ModelAndView(&quot;order&quot;, &quot;order&quot;, orderRepository.findById(id).get());</span>
+	}
+
+	@RequestMapping(value = &quot;/order/{id}&quot;, method = RequestMethod.GET)
+	public ResponseEntity&lt;Order&gt; getJSON(@PathVariable(&quot;id&quot;) long id) {
+<span class="fc" id="L72">		Optional&lt;Order&gt; response = orderRepository.findById(id);</span>
+<span class="pc bpc" id="L73" title="1 of 2 branches missed.">		if (response.isEmpty()) {</span>
+<span class="nc" id="L74">			return new ResponseEntity&lt;Order&gt;(HttpStatus.NOT_FOUND);</span>
+		} else {
+<span class="fc" id="L76">			return new ResponseEntity&lt;Order&gt;(response.get(), HttpStatus.OK);</span>
+		}
+	}
+
+	@RequestMapping(value = &quot;/full-{id}&quot;, method = RequestMethod.GET)
+	public ModelAndView full(@PathVariable(&quot;id&quot;) long id) {
+<span class="fc" id="L82">		return new ModelAndView(&quot;order-full&quot;, &quot;order&quot;, orderRepository.findById(id).get());</span>
+	}
+
+	@RequestMapping(value = &quot;/&quot;, method = RequestMethod.POST)
+	public ModelAndView post(Order order) {
+<span class="nc" id="L87">		order = orderService.order(order);</span>
+<span class="nc" id="L88">		return new ModelAndView(&quot;success&quot;);</span>
+	}
+
+	@RequestMapping(value = &quot;/{id}&quot;, method = RequestMethod.DELETE)
+	public ModelAndView delete(@PathVariable(&quot;id&quot;) long id) {
+<span class="nc" id="L93">		orderRepository.deleteById(id);</span>
+
+<span class="nc" id="L95">		return new ModelAndView(&quot;success&quot;);</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

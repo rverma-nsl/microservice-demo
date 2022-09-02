@@ -1,0 +1,55 @@
+version: "3.9"
+services:
+  web:
+    build: apache
+    ports:
+      - "8000:80"
+  postgres:
+    build: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: dbuser
+      POSTGRES_PASSWORD: dbpass
+      POSTGRES_HOST_AUTH_METHOD: trust
+  order:
+    build: microservice-istio-order
+    ports:
+      - "8081:8080"
+      - "36321:36320"
+    depends_on:
+      - postgres
+    environment:
+      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320,destfile=order-it.exec
+    volumes:
+      - jacoco:/jacoco:ro
+  shipping:
+    build: microservice-istio-shipping
+    ports:
+      - "8082:8080"
+      - "36322:36320"
+    depends_on:
+      - postgres
+      - order
+    environment:
+      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320,destfile=shipping-it.exec
+    volumes:
+      - jacoco:/jacoco:ro
+  invoicing:
+    build: microservice-istio-invoicing
+    ports:
+      - "8083:8080"
+      - "36323:36320"
+    depends_on:
+      - postgres
+      - order
+    environment:
+      JAVA_TOOL_OPTIONS: -javaagent:/jacoco/lib/jacocoagent.jar=excludes=*_javassit_*:javax.xml.soap.*:oasis.*,output=tcpserver,address=*,port=36320,destfile=invoicing-it.exec
+    volumes:
+      - jacoco:/jacoco:ro
+  jacoco:
+    image: ictu/jacoco-agent-docker:0.8.6  #cqse/teamscale-jacoco-agent:latest
+    volumes:
+      - jacoco:/jacoco:ro
+volumes:
+  jacoco:

@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Shipment.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">com.ewolff.microservice.shipping</a> &gt; <span class="el_source">Shipment.java</span></div><h1>Shipment.java</h1><pre class="source lang-java linenums">package com.ewolff.microservice.shipping;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Transient;
+
+@Entity
+public class Shipment {
+
+	@Id
+	private long id;
+
+	@Embedded
+	private Customer customer;
+
+	private Date updated;
+
+<span class="pc" id="L25">	@Embedded</span>
+	private Address shippingAddress = new Address();
+
+	@OneToMany(cascade = CascadeType.ALL)
+	private List&lt;ShipmentLine&gt; shipmentLine;
+
+	private String deliveryService;
+
+	private int cost;
+
+	public Shipment() {
+<span class="fc" id="L36">		super();</span>
+<span class="fc" id="L37">		shipmentLine = new ArrayList&lt;ShipmentLine&gt;();</span>
+<span class="fc" id="L38">	}</span>
+
+	public Shipment(long id, Customer customer, Date updated, Address shippingAddress, List&lt;ShipmentLine&gt; shipmentLine,
+			String deliveryService) {
+<span class="nc" id="L42">		super();</span>
+<span class="nc" id="L43">		this.id = id;</span>
+<span class="nc" id="L44">		this.customer = customer;</span>
+<span class="nc" id="L45">		this.updated = updated;</span>
+<span class="nc" id="L46">		this.shippingAddress = shippingAddress;</span>
+<span class="nc" id="L47">		this.shipmentLine = shipmentLine;</span>
+<span class="nc" id="L48">		this.deliveryService = deliveryService;</span>
+<span class="nc" id="L49">	}</span>
+
+	public Address getShippingAddress() {
+<span class="fc" id="L52">		return shippingAddress;</span>
+	}
+
+	public void setShippingAddress(Address shippingAddress) {
+<span class="fc" id="L56">		this.shippingAddress = shippingAddress;</span>
+<span class="fc" id="L57">	}</span>
+
+	public String getDeliveryService() {
+<span class="fc" id="L60">		return deliveryService;</span>
+	}
+
+	public void setDeliveryService(String deliveryService) {
+<span class="fc" id="L64">		this.deliveryService = deliveryService;</span>
+<span class="fc" id="L65">	}</span>
+
+	public void setId(long id) {
+<span class="fc" id="L68">		this.id = id;</span>
+<span class="fc" id="L69">	}</span>
+
+	public long getId() {
+<span class="fc" id="L72">		return id;</span>
+	}
+
+	public Date getUpdated() {
+<span class="nc" id="L76">		return updated;</span>
+	}
+
+	public void setUpdated(Date created) {
+<span class="fc" id="L80">		this.updated = created;</span>
+<span class="fc" id="L81">	}</span>
+
+	public Customer getCustomer() {
+<span class="fc" id="L84">		return customer;</span>
+	}
+
+	public void setCustomer(Customer customerId) {
+<span class="fc" id="L88">		this.customer = customerId;</span>
+<span class="fc" id="L89">	}</span>
+
+	public List&lt;ShipmentLine&gt; getShipmentLine() {
+<span class="fc" id="L92">		return shipmentLine;</span>
+	}
+
+	public Shipment(Customer customer) {
+<span class="nc" id="L96">		super();</span>
+<span class="nc" id="L97">		this.customer = customer;</span>
+<span class="nc" id="L98">		this.shipmentLine = new ArrayList&lt;ShipmentLine&gt;();</span>
+<span class="nc" id="L99">	}</span>
+
+	public void setShipmentLine(List&lt;ShipmentLine&gt; shipmentLine) {
+<span class="nc" id="L102">		this.shipmentLine = shipmentLine;</span>
+<span class="nc" id="L103">	}</span>
+
+	@Transient
+	public void setOrderLine(List&lt;ShipmentLine&gt; orderLine) {
+<span class="fc" id="L107">		this.shipmentLine = orderLine;</span>
+<span class="fc" id="L108">	}</span>
+
+	public int getNumberOfLines() {
+<span class="nc" id="L111">		return shipmentLine.size();</span>
+	}
+
+	public void setCost(int cost) {
+<span class="nc" id="L115">		this.cost = cost;</span>
+<span class="nc" id="L116">	}</span>
+
+	public int getCost() {
+<span class="fc" id="L119">		return cost;</span>
+	}
+
+	public void calculateShippingCost() {
+<span class="nc bnc" id="L123" title="All 2 branches missed.">		if (getDeliveryService().equalsIgnoreCase(&quot;DHL&quot;)) {</span>
+<span class="nc" id="L124">			setCost(1);</span>
+<span class="nc bnc" id="L125" title="All 2 branches missed.">		} else if (getDeliveryService().equalsIgnoreCase(&quot;Hermes&quot;)) {</span>
+<span class="nc" id="L126">			setCost(2);</span>
+		} else {
+<span class="nc" id="L128">			throw new IllegalArgumentException(&quot;Unknown Delivery Service!&quot;);</span>
+		}
+<span class="nc" id="L130">	}</span>
+
+	@Override
+	public int hashCode() {
+<span class="nc" id="L134">		final int prime = 31;</span>
+<span class="nc" id="L135">		int result = 1;</span>
+<span class="nc" id="L136">		result = prime * result + cost;</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">		result = prime * result + ((customer == null) ? 0 : customer.hashCode());</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">		result = prime * result + ((deliveryService == null) ? 0 : deliveryService.hashCode());</span>
+<span class="nc" id="L139">		result = prime * result + (int) (id ^ (id &gt;&gt;&gt; 32));</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">		result = prime * result + ((shipmentLine == null) ? 0 : shipmentLine.hashCode());</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">		result = prime * result + ((shippingAddress == null) ? 0 : shippingAddress.hashCode());</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">		result = prime * result + ((updated == null) ? 0 : updated.hashCode());</span>
+<span class="nc" id="L143">		return result;</span>
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+<span class="nc bnc" id="L148" title="All 2 branches missed.">		if (this == obj)</span>
+<span class="nc" id="L149">			return true;</span>
+<span class="nc bnc" id="L150" title="All 2 branches missed.">		if (obj == null)</span>
+<span class="nc" id="L151">			return false;</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">		if (getClass() != obj.getClass())</span>
+<span class="nc" id="L153">			return false;</span>
+<span class="nc" id="L154">		Shipment other = (Shipment) obj;</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">		if (cost != other.cost)</span>
+<span class="nc" id="L156">			return false;</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">		if (customer == null) {</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">			if (other.customer != null)</span>
+<span class="nc" id="L159">				return false;</span>
+<span class="nc bnc" id="L160" title="All 2 branches missed.">		} else if (!customer.equals(other.customer))</span>
+<span class="nc" id="L161">			return false;</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">		if (deliveryService == null) {</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">			if (other.deliveryService != null)</span>
+<span class="nc" id="L164">				return false;</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">		} else if (!deliveryService.equals(other.deliveryService))</span>
+<span class="nc" id="L166">			return false;</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">		if (id != other.id)</span>
+<span class="nc" id="L168">			return false;</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">		if (shipmentLine == null) {</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">			if (other.shipmentLine != null)</span>
+<span class="nc" id="L171">				return false;</span>
+<span class="nc bnc" id="L172" title="All 2 branches missed.">		} else if (!shipmentLine.equals(other.shipmentLine))</span>
+<span class="nc" id="L173">			return false;</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">		if (shippingAddress == null) {</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">			if (other.shippingAddress != null)</span>
+<span class="nc" id="L176">				return false;</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">		} else if (!shippingAddress.equals(other.shippingAddress))</span>
+<span class="nc" id="L178">			return false;</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">		if (updated == null) {</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">			if (other.updated != null)</span>
+<span class="nc" id="L181">				return false;</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">		} else if (!updated.equals(other.updated))</span>
+<span class="nc" id="L183">			return false;</span>
+<span class="nc" id="L184">		return true;</span>
+	}
+
+	@Override
+	public String toString() {
+<span class="nc" id="L189">		return &quot;Shipment [id=&quot; + id + &quot;, customer=&quot; + customer + &quot;, updated=&quot; + updated + &quot;, shippingAddress=&quot;</span>
+				+ shippingAddress + &quot;, shipmentLine=&quot; + shipmentLine + &quot;, deliveryService=&quot; + deliveryService
+				+ &quot;, cost=&quot; + cost + &quot;]&quot;;
+	}
+	
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomerTestDataGenerator.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JaCoCo Coverage Report</a> &gt; <a href="index.source.html" class="el_package">com.ewolff.microservice.order.customer</a> &gt; <span class="el_source">CustomerTestDataGenerator.java</span></div><h1>CustomerTestDataGenerator.java</h1><pre class="source lang-java linenums">package com.ewolff.microservice.order.customer;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class CustomerTestDataGenerator {
+
+	private final CustomerRepository customerRepository;
+
+	@Autowired
+<span class="fc" id="L14">	public CustomerTestDataGenerator(CustomerRepository customerRepository) {</span>
+<span class="fc" id="L15">		this.customerRepository = customerRepository;</span>
+<span class="fc" id="L16">	}</span>
+
+	private void createIfNotExist(String firstname, String name, String email, String street, String city) {
+<span class="pc bpc" id="L19" title="1 of 2 branches missed.">		if (customerRepository.findByName(name).size() == 0) {</span>
+<span class="nc" id="L20">			customerRepository.save(new Customer(firstname, name, email, street, city));</span>
+		}
+<span class="fc" id="L22">	}</span>
+
+	@PostConstruct
+	public void generateTestData() {
+<span class="fc" id="L26">		createIfNotExist(&quot;Eberhard&quot;, &quot;Wolff&quot;, &quot;eberhard.wolff@posteo.net&quot;, &quot;Unter den Linden&quot;, &quot;Berlin&quot;);</span>
+<span class="fc" id="L27">		createIfNotExist(&quot;Rod&quot;, &quot;Johnson&quot;, &quot;rod@somewhere.com&quot;, &quot;Market Street&quot;, &quot;San Francisco&quot;);</span>
+<span class="fc" id="L28">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
