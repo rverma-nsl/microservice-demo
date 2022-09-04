@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -36,7 +38,7 @@ public class OrderWebIntegrationTest {
 
 	private RestTemplate restTemplate = new RestTemplate();
 
-	@LocalServerPort
+	@Value("${local.server.port}")
 	private long serverPort;
 
 	@Autowired
@@ -77,12 +79,12 @@ public class OrderWebIntegrationTest {
 			ResponseEntity<String> resultEntity = restTemplate.getForEntity(orderURL(), String.class);
 			assertTrue(resultEntity.getStatusCode().is2xxSuccessful());
 			String orderList = resultEntity.getBody();
-			assertFalse(orderList.contains("RZA"));
+			assertFalse(Objects.requireNonNull(orderList).contains("RZA"));
 			order = new Order(customer);
 			order.addLine(42, item);
 			orderRepository.save(order);
 			orderList = restTemplate.getForObject(orderURL(), String.class);
-			assertTrue(orderList.contains("Eberhard"));
+			assertTrue(Objects.requireNonNull(orderList).contains("Eberhard"));
 		} finally {
 			if (order != null) {
 				orderRepository.delete(order);

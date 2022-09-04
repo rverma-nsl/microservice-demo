@@ -6,10 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Date;
 
+import java.util.Objects;
 import org.apache.http.client.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -31,7 +33,7 @@ import com.ewolff.microservice.order.logic.OrderRepository;
 @ActiveProfiles("test")
 public class FeedClientTest {
 
-	@LocalServerPort
+	@Value("${local.server.port}")
 	private long serverPort;
 
 	@Autowired
@@ -40,7 +42,7 @@ public class FeedClientTest {
 	@Autowired
 	private CustomerRepository customerRepository;
 
-	private RestTemplate restTemplate = new RestTemplate();
+	private final RestTemplate restTemplate = new RestTemplate();
 
 	@Test
 	public void feedReturnsBasicInformation() {
@@ -50,14 +52,15 @@ public class FeedClientTest {
 
 	@Test
 	public void requestWithLastModifiedReturns304() {
-		ResponseEntity<OrderFeed> response = restTemplate.exchange(feedUrl(), HttpMethod.GET, new HttpEntity(null),
+		ResponseEntity<OrderFeed> response = restTemplate.exchange(feedUrl(), HttpMethod.GET, new HttpEntity<>(null),
 				OrderFeed.class);
 
-		Date lastModified = DateUtils.parseDate(response.getHeaders().getFirst("Last-Modified"));
+		Date lastModified = DateUtils.parseDate(
+				Objects.requireNonNull(response.getHeaders().getFirst("Last-Modified")));
 
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.set("If-Modified-Since", DateUtils.formatDate(lastModified));
-		HttpEntity requestEntity = new HttpEntity(requestHeaders);
+		HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
 
 		response = restTemplate.exchange(feedUrl(), HttpMethod.GET, requestEntity, OrderFeed.class);
 

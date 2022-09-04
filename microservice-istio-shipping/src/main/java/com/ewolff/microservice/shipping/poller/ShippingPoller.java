@@ -5,6 +5,7 @@ import java.util.Date;
 import com.ewolff.microservice.shipping.Shipment;
 import com.ewolff.microservice.shipping.ShipmentService;
 
+import java.util.Objects;
 import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,11 @@ public class ShippingPoller {
 
 	private String url = "";
 
-	private RestTemplate restTemplate = new RestTemplate();
+	private final RestTemplate restTemplate = new RestTemplate();
 
 	private Date lastModified = null;
 
-	private ShipmentService shipmentService;
+	private final ShipmentService shipmentService;
 
 	private boolean pollingActivated = true;
 
@@ -56,22 +57,23 @@ public class ShippingPoller {
 		if (lastModified != null) {
 			requestHeaders.set(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(lastModified));
 		}
-		HttpEntity<?> requestEntity = new HttpEntity(requestHeaders);
+		HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
 		ResponseEntity<OrderFeed> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, OrderFeed.class);
 
 		if (response.getStatusCode() != HttpStatus.NOT_MODIFIED) {
 			log.trace("data has been modified");
 			OrderFeed feed = response.getBody();
-			for (OrderFeedEntry entry : feed.getOrders()) {
+			for (OrderFeedEntry entry : Objects.requireNonNull(feed).getOrders()) {
 				if ((lastModified == null) || (entry.getUpdated().after(lastModified))) {
 					Shipment shipping = restTemplate
 							.getForEntity(entry.getLink(), Shipment.class).getBody();
-					log.trace("saving shipping {}", shipping.getId());
+					log.trace("saving shipping {}", Objects.requireNonNull(shipping).getId());
 					shipmentService.ship(shipping);
 				}
 			}
 			if (response.getHeaders().getFirst("Last-Modified") != null) {
-				lastModified = DateUtils.parseDate(response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED));
+				lastModified = DateUtils.parseDate(Objects.requireNonNull(
+						response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED)));
 				log.trace("Last-Modified header {}", lastModified);
 			}
 		} else {

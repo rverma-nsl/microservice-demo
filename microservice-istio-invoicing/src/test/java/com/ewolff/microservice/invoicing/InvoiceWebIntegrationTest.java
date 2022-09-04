@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -24,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
 @ActiveProfiles("test")
 public class InvoiceWebIntegrationTest {
 
-	@LocalServerPort
+	@Value("${local.server.port}")
 	private int serverPort;
 
 	private RestTemplate restTemplate = new RestTemplate();
