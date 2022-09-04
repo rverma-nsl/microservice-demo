@@ -1,13 +1,17 @@
 # Build the project
+
 ```shell
 mvn clean install
 ```
+
 # Run the docker containers
+
 ```shell
 docker-compose up -d
 ```
 
 # Do some tests
+
 ```shell
 sleep 5
 curl -X GET http://localhost:8081/order
@@ -27,12 +31,14 @@ java -jar ~/dev/jacoco/lib/jacococli.jar dump --address localhost --port 36323 -
 ```
 
 # Merge the individual coverage reports
+
 ```shell
 
 java -jar ~/dev/jacoco/lib/jacococli.jar merge order.exec shipping.exec invoicing.exec --destfile merged.exec
 ```
 
 # Generate the html report
+
 ```shell
 
 java -jar ~/dev/jacoco/lib/jacococli.jar report merged.exec \

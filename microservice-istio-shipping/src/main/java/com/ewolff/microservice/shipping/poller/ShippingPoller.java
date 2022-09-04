@@ -23,62 +23,59 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class ShippingPoller {
 
-	private final Logger log = LoggerFactory.getLogger(ShippingPoller.class);
+  private final Logger log = LoggerFactory.getLogger(ShippingPoller.class);
+  private final RestTemplate restTemplate = new RestTemplate();
+  private final ShipmentService shipmentService;
+  private String url = "";
+  private Date lastModified = null;
+  private boolean pollingActivated = true;
 
-	private String url = "";
+  @Autowired
+  public ShippingPoller(@Value("${order.url}") String url,
+                        @Value("${poller.actived:true}") boolean pollingActivated,
+                        ShipmentService shipmentService) {
+    super();
+    this.url = url;
+    this.shipmentService = shipmentService;
+    this.pollingActivated = pollingActivated;
+  }
 
-	private final RestTemplate restTemplate = new RestTemplate();
+  @Scheduled(fixedDelay = 30000)
+  public void poll() {
+    if (pollingActivated) {
+      pollInternal();
+    }
+  }
 
-	private Date lastModified = null;
+  public void pollInternal() {
+    HttpHeaders requestHeaders = new HttpHeaders();
+    requestHeaders.set(HttpHeaders.ACCEPT, "*/*");
+    if (lastModified != null) {
+      requestHeaders.set(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(lastModified));
+    }
+    HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
+    ResponseEntity<OrderFeed> response =
+        restTemplate.exchange(url, HttpMethod.GET, requestEntity, OrderFeed.class);
 
-	private final ShipmentService shipmentService;
-
-	private boolean pollingActivated = true;
-
-	@Autowired
-	public ShippingPoller(@Value("${order.url}") String url, @Value("${poller.actived:true}") boolean pollingActivated,
-			ShipmentService shipmentService) {
-		super();
-		this.url = url;
-		this.shipmentService = shipmentService;
-		this.pollingActivated = pollingActivated;
-	}
-
-	@Scheduled(fixedDelay = 30000)
-	public void poll() {
-		if (pollingActivated) {
-			pollInternal();
-		}
-	}
-
-	public void pollInternal() {
-		HttpHeaders requestHeaders = new HttpHeaders();
-		requestHeaders.set(HttpHeaders.ACCEPT, "*/*");
-		if (lastModified != null) {
-			requestHeaders.set(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(lastModified));
-		}
-		HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
-		ResponseEntity<OrderFeed> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, OrderFeed.class);
-
-		if (response.getStatusCode() != HttpStatus.NOT_MODIFIED) {
-			log.trace("data has been modified");
-			OrderFeed feed = response.getBody();
-			for (OrderFeedEntry entry : Objects.requireNonNull(feed).getOrders()) {
-				if ((lastModified == null) || (entry.getUpdated().after(lastModified))) {
-					Shipment shipping = restTemplate
-							.getForEntity(entry.getLink(), Shipment.class).getBody();
-					log.trace("saving shipping {}", Objects.requireNonNull(shipping).getId());
-					shipmentService.ship(shipping);
-				}
-			}
-			if (response.getHeaders().getFirst("Last-Modified") != null) {
-				lastModified = DateUtils.parseDate(Objects.requireNonNull(
-						response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED)));
-				log.trace("Last-Modified header {}", lastModified);
-			}
-		} else {
-			log.trace("no new data");
-		}
-	}
+    if (response.getStatusCode() != HttpStatus.NOT_MODIFIED) {
+      log.trace("data has been modified");
+      OrderFeed feed = response.getBody();
+      for (OrderFeedEntry entry : Objects.requireNonNull(feed).getOrders()) {
+        if ((lastModified == null) || (entry.getUpdated().after(lastModified))) {
+          Shipment shipping = restTemplate
+              .getForEntity(entry.getLink(), Shipment.class).getBody();
+          log.trace("saving shipping {}", Objects.requireNonNull(shipping).getId());
+          shipmentService.ship(shipping);
+        }
+      }
+      if (response.getHeaders().getFirst("Last-Modified") != null) {
+        lastModified = DateUtils.parseDate(Objects.requireNonNull(
+            response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED)));
+        log.trace("Last-Modified header {}", lastModified);
+      }
+    } else {
+      log.trace("no new data");
+    }
+  }
 
 }

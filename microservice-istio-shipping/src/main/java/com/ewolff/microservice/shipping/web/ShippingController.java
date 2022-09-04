@@ -13,21 +13,21 @@ import com.ewolff.microservice.shipping.ShipmentRepository;
 @Controller
 public class ShippingController {
 
-	private ShipmentRepository shipmentRepository;
+  private ShipmentRepository shipmentRepository;
 
-	@Autowired
-	public ShippingController(ShipmentRepository shipmentRepository) {
-		this.shipmentRepository = shipmentRepository;
-	}
+  @Autowired
+  public ShippingController(ShipmentRepository shipmentRepository) {
+    this.shipmentRepository = shipmentRepository;
+  }
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-	public ModelAndView shipment(@PathVariable("id") long id) {
-		return new ModelAndView("shipment", "shipment", shipmentRepository.findById(id).get());
-	}
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+  public ModelAndView shipment(@PathVariable("id") long id) {
+    return new ModelAndView("shipment", "shipment", shipmentRepository.findById(id).get());
+  }
 
-	@RequestMapping("/")
-	public ModelAndView shipmentList() {
-		return new ModelAndView("shipmentlist", "shipments", shipmentRepository.findAll());
-	}
+  @RequestMapping("/")
+  public ModelAndView shipmentList() {
+    return new ModelAndView("shipmentlist", "shipments", shipmentRepository.findAll());
+  }
 
 }

@@ -2,6 +2,6 @@ package com.ewolff.microservice.shipping;
 
 public interface ShipmentService {
 
-	void ship(Shipment shipment);
+  void ship(Shipment shipment);
 
 }

@@ -11,25 +11,26 @@ import com.ewolff.microservice.order.item.ItemTestDataGenerator;
 
 @SpringBootApplication
 public class OrderApp {
-	
-	private CustomerTestDataGenerator customerTestDataGenerator;
-	private ItemTestDataGenerator itemTestDataGenerator;
-	
-	@Autowired
-	public OrderApp(CustomerTestDataGenerator customerTestDataGenerator, ItemTestDataGenerator itemTestDataGenerator) {
-		super();
-		this.customerTestDataGenerator = customerTestDataGenerator;
-		this.itemTestDataGenerator = itemTestDataGenerator;
-	}
 
-	@PostConstruct
-	public void generateTestData() {
-		customerTestDataGenerator.generateTestData();
-		itemTestDataGenerator.generateTestData();
-	}
-	
-	public static void main(String[] args) {
-		SpringApplication.run(OrderApp.class, args);
-	}
+  private CustomerTestDataGenerator customerTestDataGenerator;
+  private ItemTestDataGenerator itemTestDataGenerator;
+
+  @Autowired
+  public OrderApp(CustomerTestDataGenerator customerTestDataGenerator,
+                  ItemTestDataGenerator itemTestDataGenerator) {
+    super();
+    this.customerTestDataGenerator = customerTestDataGenerator;
+    this.itemTestDataGenerator = itemTestDataGenerator;
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(OrderApp.class, args);
+  }
+
+  @PostConstruct
+  public void generateTestData() {
+    customerTestDataGenerator.generateTestData();
+    itemTestDataGenerator.generateTestData();
+  }
 
 }

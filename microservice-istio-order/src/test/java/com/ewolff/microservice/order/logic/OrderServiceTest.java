@@ -18,18 +18,18 @@ import com.ewolff.microservice.order.OrderApp;
 @ActiveProfiles("test")
 public class OrderServiceTest {
 
-	@Autowired
-	private OrderRepository orderRepository;
+  @Autowired
+  private OrderRepository orderRepository;
 
-	@Test
-	@Transactional
-	public void lastCreatedIsUpdated() {
-		Order order = new Order();
-		order = orderRepository.save(order);
-		assertEquals(order.getUpdated(), orderRepository.lastUpdate());
-		order = new Order();
-		order = orderRepository.save(order);
-		assertEquals(order.getUpdated(), orderRepository.lastUpdate());
-	}
+  @Test
+  @Transactional
+  public void lastCreatedIsUpdated() {
+    Order order = new Order();
+    order = orderRepository.save(order);
+    assertEquals(order.getUpdated(), orderRepository.lastUpdate());
+    order = new Order();
+    order = orderRepository.save(order);
+    assertEquals(order.getUpdated(), orderRepository.lastUpdate());
+  }
 
 }

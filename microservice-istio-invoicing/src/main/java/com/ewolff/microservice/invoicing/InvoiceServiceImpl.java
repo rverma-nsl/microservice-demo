@@ -9,24 +9,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
 
-	private final Logger log = LoggerFactory.getLogger(InvoiceServiceImpl.class);
+  private final Logger log = LoggerFactory.getLogger(InvoiceServiceImpl.class);
 
-	private InvoiceRepository invoiceRepository;
+  private InvoiceRepository invoiceRepository;
 
-	@Autowired
-	public InvoiceServiceImpl(InvoiceRepository invoiceRepository) {
-		super();
-		this.invoiceRepository = invoiceRepository;
-	}
+  @Autowired
+  public InvoiceServiceImpl(InvoiceRepository invoiceRepository) {
+    super();
+    this.invoiceRepository = invoiceRepository;
+  }
 
-	@Override
-	@Transactional
-	public void generateInvoice(Invoice invoice) {
-		if (invoiceRepository.existsById(invoice.getId())) {
-			log.info("Invoice id {} already exists - ignored", invoice.getId());
-		} else {
-			invoiceRepository.save(invoice);
-		}
-	}
+  @Override
+  @Transactional
+  public void generateInvoice(Invoice invoice) {
+    if (invoiceRepository.existsById(invoice.getId())) {
+      log.info("Invoice id {} already exists - ignored", invoice.getId());
+    } else {
+      invoiceRepository.save(invoice);
+    }
+  }
 
 }

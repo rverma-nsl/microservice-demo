@@ -11,12 +11,12 @@ import com.ewolff.microservice.shipping.poller.OrderFeedEntry;
 
 @EnableScheduling
 @SpringBootApplication
-@TypeHint(types = { OrderFeed.class, OrderFeedEntry.class })
-@TypeHint(types = { IterationStatusVar.class })
+@TypeHint(types = {OrderFeed.class, OrderFeedEntry.class})
+@TypeHint(types = {IterationStatusVar.class})
 public class ShippingApp {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ShippingApp.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(ShippingApp.class, args);
+  }
 
 }

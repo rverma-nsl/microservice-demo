@@ -13,21 +13,21 @@ import com.ewolff.microservice.invoicing.InvoiceRepository;
 @Controller
 public class InvoiceController {
 
-	private InvoiceRepository invoiceRepository;
+  private InvoiceRepository invoiceRepository;
 
-	@Autowired
-	public InvoiceController(InvoiceRepository invoiceRepository) {
-		this.invoiceRepository = invoiceRepository;
-	}
+  @Autowired
+  public InvoiceController(InvoiceRepository invoiceRepository) {
+    this.invoiceRepository = invoiceRepository;
+  }
 
-	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-	public ModelAndView invoice(@PathVariable("id") long id) {
-		return new ModelAndView("invoice", "invoice", invoiceRepository.findById(id).get());
-	}
+  @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
+  public ModelAndView invoice(@PathVariable("id") long id) {
+    return new ModelAndView("invoice", "invoice", invoiceRepository.findById(id).get());
+  }
 
-	@RequestMapping("/")
-	public ModelAndView invoiceList() {
-		return new ModelAndView("invoicelist", "invoices", invoiceRepository.findAll());
-	}
+  @RequestMapping("/")
+  public ModelAndView invoiceList() {
+    return new ModelAndView("invoicelist", "invoices", invoiceRepository.findAll());
+  }
 
 }

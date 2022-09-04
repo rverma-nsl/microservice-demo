@@ -18,17 +18,17 @@ import com.ewolff.microservice.order.item.ItemTestDataGenerator;
 @ActiveProfiles("test")
 public class ItemTestDataGeneratorTest {
 
-	@Autowired
-	private ItemRepository itemRepository;
+  @Autowired
+  private ItemRepository itemRepository;
 
-	@Autowired
-	private ItemTestDataGenerator itemTestDataGenerator;
+  @Autowired
+  private ItemTestDataGenerator itemTestDataGenerator;
 
-	@Test
-	public void assureTestDataGeneratedOnce() {
-		assertEquals(1, itemRepository.findByName("iPod").size());
-		itemTestDataGenerator.generateTestData();
-		assertEquals(1, itemRepository.findByName("iPod").size());
-	}
+  @Test
+  public void assureTestDataGeneratedOnce() {
+    assertEquals(1, itemRepository.findByName("iPod").size());
+    itemTestDataGenerator.generateTestData();
+    assertEquals(1, itemRepository.findByName("iPod").size());
+  }
 
 }

@@ -33,61 +33,59 @@ import com.ewolff.microservice.order.logic.OrderRepository;
 @ActiveProfiles("test")
 public class FeedClientTest {
 
-	@Value("${local.server.port}")
-	private long serverPort;
+  private final RestTemplate restTemplate = new RestTemplate();
+  @Value("${local.server.port}")
+  private long serverPort;
+  @Autowired
+  private OrderRepository orderRepository;
+  @Autowired
+  private CustomerRepository customerRepository;
 
-	@Autowired
-	private OrderRepository orderRepository;
+  @Test
+  public void feedReturnsBasicInformation() {
+    OrderFeed feed = retrieveFeed();
+    assertNotNull(feed.getUpdated());
+  }
 
-	@Autowired
-	private CustomerRepository customerRepository;
+  @Test
+  public void requestWithLastModifiedReturns304() {
+    ResponseEntity<OrderFeed> response =
+        restTemplate.exchange(feedUrl(), HttpMethod.GET, new HttpEntity<>(null),
+            OrderFeed.class);
 
-	private final RestTemplate restTemplate = new RestTemplate();
+    Date lastModified = DateUtils.parseDate(
+        Objects.requireNonNull(response.getHeaders().getFirst("Last-Modified")));
 
-	@Test
-	public void feedReturnsBasicInformation() {
-		OrderFeed feed = retrieveFeed();
-		assertNotNull(feed.getUpdated());
-	}
+    HttpHeaders requestHeaders = new HttpHeaders();
+    requestHeaders.set("If-Modified-Since", DateUtils.formatDate(lastModified));
+    HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
 
-	@Test
-	public void requestWithLastModifiedReturns304() {
-		ResponseEntity<OrderFeed> response = restTemplate.exchange(feedUrl(), HttpMethod.GET, new HttpEntity<>(null),
-				OrderFeed.class);
+    response = restTemplate.exchange(feedUrl(), HttpMethod.GET, requestEntity, OrderFeed.class);
 
-		Date lastModified = DateUtils.parseDate(
-				Objects.requireNonNull(response.getHeaders().getFirst("Last-Modified")));
+    assertEquals(HttpStatus.NOT_MODIFIED, response.getStatusCode());
+  }
 
-		HttpHeaders requestHeaders = new HttpHeaders();
-		requestHeaders.set("If-Modified-Since", DateUtils.formatDate(lastModified));
-		HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
+  @Test
+  public void feedReturnsNewlyCreatedOrder() {
+    Order order = new Order();
+    order.setCustomer(customerRepository.findAll().iterator().next());
+    orderRepository.save(order);
+    OrderFeed feed = retrieveFeed();
+    boolean foundLinkToCreatedOrder = false;
+    for (OrderFeedEntry entry : feed.getOrders()) {
+      if (entry.getLink().contains(Long.toString(order.getId()))) {
+        foundLinkToCreatedOrder = true;
+      }
+    }
+    assertTrue(foundLinkToCreatedOrder);
+  }
 
-		response = restTemplate.exchange(feedUrl(), HttpMethod.GET, requestEntity, OrderFeed.class);
+  private OrderFeed retrieveFeed() {
+    return restTemplate.getForEntity(feedUrl(), OrderFeed.class).getBody();
+  }
 
-		assertEquals(HttpStatus.NOT_MODIFIED, response.getStatusCode());
-	}
-
-	@Test
-	public void feedReturnsNewlyCreatedOrder() {
-		Order order = new Order();
-		order.setCustomer(customerRepository.findAll().iterator().next());
-		orderRepository.save(order);
-		OrderFeed feed = retrieveFeed();
-		boolean foundLinkToCreatedOrder = false;
-		for (OrderFeedEntry entry : feed.getOrders()) {
-			if (entry.getLink().contains(Long.toString(order.getId()))) {
-				foundLinkToCreatedOrder = true;
-			}
-		}
-		assertTrue(foundLinkToCreatedOrder);
-	}
-
-	private OrderFeed retrieveFeed() {
-		return restTemplate.getForEntity(feedUrl(), OrderFeed.class).getBody();
-	}
-
-	private String feedUrl() {
-		return String.format("http://localhost:%d/feed", serverPort);
-	}
+  private String feedUrl() {
+    return String.format("http://localhost:%d/feed", serverPort);
+  }
 
 }

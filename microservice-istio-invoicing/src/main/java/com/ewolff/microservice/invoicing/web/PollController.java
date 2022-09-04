@@ -10,17 +10,17 @@ import com.ewolff.microservice.invoicing.poller.InvoicePoller;
 @Controller
 public class PollController {
 
-	private InvoicePoller poller;
+  private InvoicePoller poller;
 
-	@Autowired
-	public PollController(InvoicePoller poller) {
-		this.poller = poller;
-	}
+  @Autowired
+  public PollController(InvoicePoller poller) {
+    this.poller = poller;
+  }
 
-	@RequestMapping(value = "/poll", method = RequestMethod.POST)
-	public String poll() {
-		poller.poll();
-		return "success";
-	}
+  @RequestMapping(value = "/poll", method = RequestMethod.POST)
+  public String poll() {
+    poller.poll();
+    return "success";
+  }
 
 }

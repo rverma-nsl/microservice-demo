@@ -10,17 +10,17 @@ import com.ewolff.microservice.shipping.poller.ShippingPoller;
 @Controller
 public class PollController {
 
-	private ShippingPoller poller;
+  private ShippingPoller poller;
 
-	@Autowired
-	public PollController(ShippingPoller poller) {
-		this.poller = poller;
-	}
+  @Autowired
+  public PollController(ShippingPoller poller) {
+    this.poller = poller;
+  }
 
-	@RequestMapping(value = "/poll", method = RequestMethod.POST)
-	public String poll() {
-		poller.poll();
-		return "success";
-	}
+  @RequestMapping(value = "/poll", method = RequestMethod.POST)
+  public String poll() {
+    poller.poll();
+    return "success";
+  }
 
 }

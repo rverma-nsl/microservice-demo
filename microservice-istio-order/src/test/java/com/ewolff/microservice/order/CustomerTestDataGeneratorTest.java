@@ -18,17 +18,17 @@ import com.ewolff.microservice.order.customer.CustomerTestDataGenerator;
 @ActiveProfiles("test")
 public class CustomerTestDataGeneratorTest {
 
-	@Autowired
-	private CustomerRepository customerRepository;
+  @Autowired
+  private CustomerRepository customerRepository;
 
-	@Autowired
-	private CustomerTestDataGenerator customerTestDataGenerator;
+  @Autowired
+  private CustomerTestDataGenerator customerTestDataGenerator;
 
-	@Test
-	public void assureTestDataGeneratedOnce() {
-		assertEquals(1, customerRepository.findByName("Wolff").size());
-		customerTestDataGenerator.generateTestData();
-		assertEquals(1, customerRepository.findByName("Wolff").size());
-	}
+  @Test
+  public void assureTestDataGeneratedOnce() {
+    assertEquals(1, customerRepository.findByName("Wolff").size());
+    customerTestDataGenerator.generateTestData();
+    assertEquals(1, customerRepository.findByName("Wolff").size());
+  }
 
 }

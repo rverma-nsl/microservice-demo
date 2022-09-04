@@ -25,31 +25,31 @@ import org.springframework.web.client.RestTemplate;
 @ActiveProfiles("test")
 public class InvoiceWebIntegrationTest {
 
-	@Value("${local.server.port}")
-	private int serverPort;
+  @Value("${local.server.port}")
+  private int serverPort;
 
-	private RestTemplate restTemplate = new RestTemplate();
+  private RestTemplate restTemplate = new RestTemplate();
 
-	@Test
-	public void isHTMLReturned() {
-		String body = getForMediaType(String.class, MediaType.TEXT_HTML, shippingURL());
+  @Test
+  public void isHTMLReturned() {
+    String body = getForMediaType(String.class, MediaType.TEXT_HTML, shippingURL());
 
-		assertThat(body, containsString("<div"));
-	}
+    assertThat(body, containsString("<div"));
+  }
 
-	private String shippingURL() {
-		return "http://localhost:" + serverPort;
-	}
+  private String shippingURL() {
+    return "http://localhost:" + serverPort;
+  }
 
-	private <T> T getForMediaType(Class<T> value, MediaType mediaType, String url) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setAccept(Arrays.asList(mediaType));
+  private <T> T getForMediaType(Class<T> value, MediaType mediaType, String url) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Arrays.asList(mediaType));
 
-		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+    HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
 
-		ResponseEntity<T> resultEntity = restTemplate.exchange(url, HttpMethod.GET, entity, value);
+    ResponseEntity<T> resultEntity = restTemplate.exchange(url, HttpMethod.GET, entity, value);
 
-		return resultEntity.getBody();
-	}
+    return resultEntity.getBody();
+  }
 
 }

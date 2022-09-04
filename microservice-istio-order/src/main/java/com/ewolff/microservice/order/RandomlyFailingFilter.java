@@ -18,28 +18,28 @@ import org.springframework.stereotype.Component;
 @Component
 public class RandomlyFailingFilter implements Filter {
 
-	private final Logger log = LoggerFactory.getLogger(RandomlyFailingFilter.class);
+  private final Logger log = LoggerFactory.getLogger(RandomlyFailingFilter.class);
 
-	@Value("${failrandomly:false}")
-	private boolean failRandomly = false;
+  @Value("${failrandomly:false}")
+  private boolean failRandomly = false;
 
-	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-	}
+  @Override
+  public void init(FilterConfig filterConfig) throws ServletException {
+  }
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		if ((Math.random() <= 0.5D) || (!failRandomly)) {
-			chain.doFilter(request, response);
-		} else {
-			log.trace("Made HTTP Request fail with 500");
-			((HttpServletResponse) response).sendError(500);
-		}
-	}
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws IOException, ServletException {
+    if ((Math.random() <= 0.5D) || (!failRandomly)) {
+      chain.doFilter(request, response);
+    } else {
+      log.trace("Made HTTP Request fail with 500");
+      ((HttpServletResponse) response).sendError(500);
+    }
+  }
 
-	@Override
-	public void destroy() {
-	}
+  @Override
+  public void destroy() {
+  }
 
 }

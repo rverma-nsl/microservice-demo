@@ -23,64 +23,61 @@ import com.ewolff.microservice.invoicing.InvoiceService;
 @Component
 public class InvoicePoller {
 
-	private final Logger log = LoggerFactory.getLogger(InvoicePoller.class);
+  private final Logger log = LoggerFactory.getLogger(InvoicePoller.class);
+  private final RestTemplate restTemplate = new RestTemplate();
+  private final boolean pollingActivated;
+  private final InvoiceService invoiceService;
+  private String url = "";
+  private Date lastModified = null;
 
-	private String url = "";
+  @Autowired
+  public InvoicePoller(@Value("${order.url}") String url,
+                       @Value("${poller.actived:true}") boolean pollingActivated,
+                       InvoiceService invoiceService) {
+    super();
+    this.pollingActivated = pollingActivated;
+    this.url = url;
+    this.invoiceService = invoiceService;
+  }
 
-	private final RestTemplate restTemplate = new RestTemplate();
+  @Scheduled(fixedDelay = 30000)
+  public void poll() {
+    if (pollingActivated) {
+      pollInternal();
+    }
+  }
 
-	private Date lastModified = null;
+  public void pollInternal() {
+    HttpHeaders requestHeaders = new HttpHeaders();
+    requestHeaders.set(HttpHeaders.ACCEPT, "*/*");
+    if (lastModified != null) {
+      requestHeaders.set(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(lastModified));
+    }
+    HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
+    ResponseEntity<OrderFeed> response =
+        restTemplate.exchange(url, HttpMethod.GET, requestEntity, OrderFeed.class);
 
-	private final boolean pollingActivated;
-
-	private final InvoiceService invoiceService;
-
-	@Autowired
-	public InvoicePoller(@Value("${order.url}") String url, @Value("${poller.actived:true}") boolean pollingActivated,
-			InvoiceService invoiceService) {
-		super();
-		this.pollingActivated = pollingActivated;
-		this.url = url;
-		this.invoiceService = invoiceService;
-	}
-
-	@Scheduled(fixedDelay = 30000)
-	public void poll() {
-		if (pollingActivated) {
-			pollInternal();
-		}
-	}
-
-	public void pollInternal() {
-		HttpHeaders requestHeaders = new HttpHeaders();
-		requestHeaders.set(HttpHeaders.ACCEPT, "*/*");
-		if (lastModified != null) {
-			requestHeaders.set(HttpHeaders.IF_MODIFIED_SINCE, DateUtils.formatDate(lastModified));
-		}
-		HttpEntity<?> requestEntity = new HttpEntity<>(requestHeaders);
-		ResponseEntity<OrderFeed> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, OrderFeed.class);
-
-		if (response.getStatusCode() != HttpStatus.NOT_MODIFIED) {
-			log.trace("data has been modified");
-			OrderFeed feed = response.getBody();
-			assert feed != null;
-			for (OrderFeedEntry entry : feed.getOrders()) {
-				if ((lastModified == null) || (entry.getUpdated().after(lastModified))) {
-					Invoice invoice = restTemplate
-							.getForEntity(entry.getLink(), Invoice.class).getBody();
-					assert invoice != null;
-					log.trace("saving invoice {}", invoice.getId());
-					invoiceService.generateInvoice(invoice);
-				}
-			}
-			if (response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED) != null) {
-				lastModified = DateUtils.parseDate(Objects.requireNonNull(
-						response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED)));
-				log.trace("Last-Modified header {}", lastModified);
-			}
-		} else {
-			log.trace("no new data");
-		}
-	}
+    if (response.getStatusCode() != HttpStatus.NOT_MODIFIED) {
+      log.trace("data has been modified");
+      OrderFeed feed = response.getBody();
+      assert feed != null;
+      for (OrderFeedEntry entry : feed.getOrders()) {
+        if ((lastModified == null) || (entry.getUpdated().after(lastModified))) {
+          Invoice invoice = restTemplate
+              .getForEntity(entry.getLink(), Invoice.class).getBody();
+          assert invoice != null;
+          log.trace("saving invoice {}", invoice.getId());
+          invoiceService.generateInvoice(invoice);
+        }
+      }
+      if (response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED) != null) {
+        lastModified = DateUtils.parseDate(Objects.requireNonNull(
+            response.getHeaders().getFirst(HttpHeaders.LAST_MODIFIED)));
+        log.trace("Last-Modified header {}", lastModified);
+      }
+    } else {
+      log.trace("no new data");
+    }
+  }
 
 }

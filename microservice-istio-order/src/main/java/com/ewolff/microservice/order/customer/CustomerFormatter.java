@@ -10,21 +10,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomerFormatter implements Formatter<Customer> {
 
-	private CustomerRepository customerRepository;
+  private CustomerRepository customerRepository;
 
-	@Autowired
-	public CustomerFormatter(CustomerRepository customerRepository) {
-		this.customerRepository = customerRepository;
-	}
+  @Autowired
+  public CustomerFormatter(CustomerRepository customerRepository) {
+    this.customerRepository = customerRepository;
+  }
 
-	@Override
-	public String print(Customer customer, Locale locale) {
-		return customer.getCustomerId().toString();
-	}
+  @Override
+  public String print(Customer customer, Locale locale) {
+    return customer.getCustomerId().toString();
+  }
 
-	@Override
-	public Customer parse(String text, Locale locale) throws ParseException {
-		return customerRepository.findById(Long.parseLong(text)).get();
-	}
+  @Override
+  public Customer parse(String text, Locale locale) throws ParseException {
+    return customerRepository.findById(Long.parseLong(text)).get();
+  }
 
 }

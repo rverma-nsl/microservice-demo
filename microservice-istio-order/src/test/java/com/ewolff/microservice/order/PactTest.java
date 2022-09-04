@@ -21,15 +21,15 @@ import au.com.dius.pact.provider.junitsupport.loader.PactFolder;
 @PactFolder("pacts")
 public class PactTest {
 
-	@BeforeEach
-	void setupTestTarget(PactVerificationContext context) {
-		context.setTarget(new HttpTestTarget("localhost", 8080, "/"));
-	}
+  @BeforeEach
+  void setupTestTarget(PactVerificationContext context) {
+    context.setTarget(new HttpTestTarget("localhost", 8080, "/"));
+  }
 
-	@TestTemplate
-	@ExtendWith(PactVerificationInvocationContextProvider.class)
-	void pactVerificationTestTemplate(PactVerificationContext context) {
-		context.verifyInteraction();
-	}
+  @TestTemplate
+  @ExtendWith(PactVerificationInvocationContextProvider.class)
+  void pactVerificationTestTemplate(PactVerificationContext context) {
+    context.verifyInteraction();
+  }
 
 }

@@ -7,7 +7,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface OrderRepository extends PagingAndSortingRepository<Order, Long> {
 
-	@Query("SELECT max(o.updated) FROM Order o")
-	Date lastUpdate();
+  @Query("SELECT max(o.updated) FROM Order o")
+  Date lastUpdate();
 
 }

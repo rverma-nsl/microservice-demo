@@ -36,82 +36,84 @@ import com.ewolff.microservice.order.item.ItemRepository;
 @TestInstance(Lifecycle.PER_CLASS)
 public class OrderWebIntegrationTest {
 
-	private RestTemplate restTemplate = new RestTemplate();
+  private RestTemplate restTemplate = new RestTemplate();
 
-	@Value("${local.server.port}")
-	private long serverPort;
+  @Value("${local.server.port}")
+  private long serverPort;
 
-	@Autowired
-	private ItemRepository itemRepository;
+  @Autowired
+  private ItemRepository itemRepository;
 
-	@Autowired
-	private CustomerRepository customerRepository;
+  @Autowired
+  private CustomerRepository customerRepository;
 
-	@Autowired
-	private OrderRepository orderRepository;
+  @Autowired
+  private OrderRepository orderRepository;
 
-	private Item item;
+  private Item item;
 
-	private Customer customer;
+  private Customer customer;
 
-	@BeforeAll
-	public void setup() {
-		item = itemRepository.findAll().iterator().next();
-		customer = new Customer("RZA", "GZA", "rza@wutang.com", "Chamber", "Shaolin");
-		customer = customerRepository.save(customer);
-	}
+  @BeforeAll
+  public void setup() {
+    item = itemRepository.findAll().iterator().next();
+    customer = new Customer("RZA", "GZA", "rza@wutang.com", "Chamber", "Shaolin");
+    customer = customerRepository.save(customer);
+  }
 
-	@Test
-	public void IsTestOrderReturned() {
-		ResponseEntity<String> resultEntity = restTemplate.getForEntity(orderURL() + "/order/1", String.class);
-		assertTrue(resultEntity.getStatusCode().is2xxSuccessful());
-		String order = resultEntity.getBody();
-		assertTrue(order.contains("Berlin"));
-	}
+  @Test
+  public void IsTestOrderReturned() {
+    ResponseEntity<String> resultEntity =
+        restTemplate.getForEntity(orderURL() + "/order/1", String.class);
+    assertTrue(resultEntity.getStatusCode().is2xxSuccessful());
+    String order = resultEntity.getBody();
+    assertTrue(order.contains("Berlin"));
+  }
 
-	@Test
-	public void IsOrderListReturned() {
-		Order order = null;
-		try {
-			Iterable<Order> orders = orderRepository.findAll();
-			assertTrue(StreamSupport.stream(orders.spliterator(), false)
-									.noneMatch(o -> ((o.getCustomer() != null) && (o.getCustomer().equals(customer)))));
-			ResponseEntity<String> resultEntity = restTemplate.getForEntity(orderURL(), String.class);
-			assertTrue(resultEntity.getStatusCode().is2xxSuccessful());
-			String orderList = resultEntity.getBody();
-			assertFalse(Objects.requireNonNull(orderList).contains("RZA"));
-			order = new Order(customer);
-			order.addLine(42, item);
-			orderRepository.save(order);
-			orderList = restTemplate.getForObject(orderURL(), String.class);
-			assertTrue(Objects.requireNonNull(orderList).contains("Eberhard"));
-		} finally {
-			if (order != null) {
-				orderRepository.delete(order);
-			}
-		}
-	}
+  @Test
+  public void IsOrderListReturned() {
+    Order order = null;
+    try {
+      Iterable<Order> orders = orderRepository.findAll();
+      assertTrue(StreamSupport.stream(orders.spliterator(), false)
+          .noneMatch(o -> ((o.getCustomer() != null) && (o.getCustomer().equals(customer)))));
+      ResponseEntity<String> resultEntity = restTemplate.getForEntity(orderURL(), String.class);
+      assertTrue(resultEntity.getStatusCode().is2xxSuccessful());
+      String orderList = resultEntity.getBody();
+      assertFalse(Objects.requireNonNull(orderList).contains("RZA"));
+      order = new Order(customer);
+      order.addLine(42, item);
+      orderRepository.save(order);
+      orderList = restTemplate.getForObject(orderURL(), String.class);
+      assertTrue(Objects.requireNonNull(orderList).contains("Eberhard"));
+    } finally {
+      if (order != null) {
+        orderRepository.delete(order);
+      }
+    }
+  }
 
-	private String orderURL() {
-		return "http://localhost:" + serverPort;
-	}
+  private String orderURL() {
+    return "http://localhost:" + serverPort;
+  }
 
-	@Test
-	public void IsOrderFormDisplayed() {
-		ResponseEntity<String> resultEntity = restTemplate.getForEntity(orderURL() + "/form.html", String.class);
-		assertTrue(resultEntity.getStatusCode().is2xxSuccessful());
-		assertTrue(resultEntity.getBody().contains("<form"));
-	}
+  @Test
+  public void IsOrderFormDisplayed() {
+    ResponseEntity<String> resultEntity =
+        restTemplate.getForEntity(orderURL() + "/form.html", String.class);
+    assertTrue(resultEntity.getStatusCode().is2xxSuccessful());
+    assertTrue(resultEntity.getBody().contains("<form"));
+  }
 
-	@Test
-	public void IsSubmittedOrderSaved() {
-		long before = orderRepository.count();
-		MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-		map.add("submit", "");
-		map.add("customer", Long.toString(customer.getCustomerId()));
-		map.add("orderLine[0].item", Long.toString(item.getItemId()));
-		map.add("orderLine[0].count", "42");
-		restTemplate.postForLocation(orderURL(), map, String.class);
-		assertEquals(before + 1, orderRepository.count());
-	}
+  @Test
+  public void IsSubmittedOrderSaved() {
+    long before = orderRepository.count();
+    MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+    map.add("submit", "");
+    map.add("customer", Long.toString(customer.getCustomerId()));
+    map.add("orderLine[0].item", Long.toString(item.getItemId()));
+    map.add("orderLine[0].count", "42");
+    restTemplate.postForLocation(orderURL(), map, String.class);
+    assertEquals(before + 1, orderRepository.count());
+  }
 }

@@ -20,3 +20,5 @@ buildNumber.properties
 .code
 .vscode
 *~
+build/
+.gradle/
